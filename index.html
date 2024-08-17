@@ -1,1 +1,203 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story Map of Mountains in Kenya</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .b-shadow {
+      box-shadow: 1px 1px 1px 1px grey;
+    }
+
+    body {
+      background-color: white;
+      color: #000;
+    }
+
+    #map {
+      height: 600px;
+      margin-top: 20px;
+    }
+
+    .popup-content {
+      font-size: 16px;
+    }
+
+    .popup-image {
+      max-width: 150px;
+      max-height: 100px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .navbar {
+      margin-bottom: 20px;
+    }
+
+    .mountain-card {
+      cursor: pointer;
+      margin-bottom: 15px; /* Space between cards */
+    }
+
+    .card-container {
+      height: 100vh;
+      overflow-y: auto;
+      padding-right: 15px; /* Add some padding to avoid scrollbar overlap */
+    }
+    
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .section-content {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+    <a class="navbar-brand w-100 text-center" href="#">Mountains In Kenya</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Mountain Cards -->
+      
+      <!-- Map -->
+
+      <div class="col-lg-3">
+        <div class="card text-dark">
+          <div class="card-header">
+            <h5>About the Map</h5>
+          </div>
+          <div class="card-body">
+            <p>This map highlights key mountains in Kenya, providing information on their location and significance. Each marker includes an image and a brief description of the mountain.</p>
+          </div>
+        </div>
+
+        <!-- Key Facts Section -->
+        <div class="card text-dark section-title">
+          <div class="card-header">
+            <h5>Key Facts</h5>
+          </div>
+          <div class="card-body section-content">
+            <p>This section provides interesting facts about the mountains in Kenya, including their heights, geographical significance, and notable features.</p>
+          </div>
+        </div>
+
+        <!-- Historical Significance Section -->
+        <div class="card text-dark section-title">
+          <div class="card-header">
+            <h5>Historical Significance</h5>
+          </div>
+          <div class="card-body section-content">
+            <p>Explore the historical importance of these mountains, including their cultural and historical roles in Kenyan society and their impact on local traditions.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div id="map"></div>
+      </div>
+
+      <div class="col-lg-3 card-container">
+        <div class="d-flex flex-column">
+          <!-- Cards will be dynamically added here -->
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    // Initialize the map
+    const map = L.map('map').setView([-1.286389, 36.817223], 6);
+
+    // Add a tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Mountain data with images
+    const mountainData = [
+      {
+        name: "Mount Kenya",
+        lat: -0.155,
+        lon: 37.308,
+        description: "The highest mountain in Kenya and the second highest in Africa.",
+        image: "mount-kenya.jpeg"
+      },
+      {
+        name: "Mount Elgon",
+        lat: 1.130,
+        lon: 34.710,
+        description: "A large extinct shield volcano on the border between Uganda and Kenya.",
+        image: "mount-elgon.jpeg"
+      },
+      {
+        name: "Mount Longonot",
+        lat: -1.358,
+        lon: 36.550,
+        description: "A stratovolcano located in the Great Rift Valley.",
+        image: "mount-longonot.jpeg"
+      },
+      {
+        name: "Aberdare Ranges",
+        lat: -0.303,
+        lon: 36.799,
+        description: "A range of mountains in the central part of Kenya.",
+        image: "mount-aberdare.jpeg"
+      },
+    ];
+
+    // Add mountain cards
+    const cardContainer = document.querySelector('.d-flex.flex-column');
+    mountainData.forEach(mountain => {
+      const card = document.createElement('div');
+      card.classList.add('card', 'mountain-card', 'bg-info', 'b-shadow');
+      card.innerHTML = `
+        <img src="${mountain.image}" class="card-img-top" alt="${mountain.name}">
+        <div class="card-body">
+          <h5 class="card-title">${mountain.name}</h5>
+          <p class="card-text">${mountain.description}</p>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        map.setView([mountain.lat, mountain.lon], 14);
+        L.popup()
+          .setLatLng([mountain.lat, mountain.lon])
+          .setContent(`
+            <strong>${mountain.name}</strong><br>
+            <img src="${mountain.image}" alt="${mountain.name}" class="popup-image"><br>
+            ${mountain.description}
+          `)
+          .openOn(map);
+      });
+      cardContainer.appendChild(card);
+    });
+
+    // Add markers for mountains with image popups
+    mountainData.forEach(mountain => {
+      const marker = L.marker([mountain.lat, mountain.lon]).addTo(map);
+      marker.bindPopup(`
+        <strong>${mountain.name}</strong><br>
+        <img src="${mountain.image}" alt="${mountain.name}" class="popup-image"><br>
+        ${mountain.description}
+      `);
+    });
+  </script>
+</body>
+</html>
